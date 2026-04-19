@@ -8,7 +8,9 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
@@ -20,12 +22,14 @@ import java.io.IOException;
 import java.time.Instant;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Slf4j
 public class OAuth2AuthenticationSuccessHandler
         extends SimpleUrlAuthenticationSuccessHandler {
 
     private final JwtUtil jwtUtil;
+    @Value("${client.url}")
+    private String clientUrl;
 
     private final OAuthTokenRepository oAuthTokenRepository;
     private final OAuth2AuthorizedClientService clientService;
@@ -79,8 +83,9 @@ public class OAuth2AuthenticationSuccessHandler
         response.addCookie(refreshCookie);
 
         // redirection frontend
+        String dashboardUrl = clientUrl + "/dashboard";
         getRedirectStrategy().sendRedirect(
-                request, response, "http://localhost:3000/dashboard"
+                request, response, dashboardUrl
         );
     }
 }
