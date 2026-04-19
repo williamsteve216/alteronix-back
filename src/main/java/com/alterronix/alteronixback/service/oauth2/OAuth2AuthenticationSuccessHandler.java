@@ -11,6 +11,8 @@ import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
@@ -74,13 +76,24 @@ public class OAuth2AuthenticationSuccessHandler
         cookie.setHttpOnly(true);
         cookie.setSecure(true);
         cookie.setPath("/");
-        response.addCookie(cookie);
 
-        Cookie refreshCookie = new Cookie("refresh_token", refreshToken);
-        refreshCookie.setHttpOnly(true);
-        refreshCookie.setSecure(true);
-        refreshCookie.setPath("/");
-        response.addCookie(refreshCookie);
+        ResponseCookie springCookie = ResponseCookie.from("access_token", accessToken)
+                .httpOnly(true)
+                .secure(true)
+                .path("/")
+                .sameSite("None")    // ← obligatoire pour cross-origin
+                .build();
+
+        response.addHeader(HttpHeaders.SET_COOKIE, springCookie.toString());
+
+        ResponseCookie refreshCookie = ResponseCookie.from("refresh_token", refreshToken)
+                .httpOnly(true)
+                .secure(true)
+                .path("/")
+                .sameSite("None")
+                .build();
+
+        response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
 
         // redirection frontend
         String dashboardUrl = clientUrl + "/dashboard";
