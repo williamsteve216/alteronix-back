@@ -26,7 +26,7 @@ jobs:
         with:
           context: .
           push: true
-          tags: ghcr.io/williamsteve216/alteronix-backend:latest
+          tags: ghcr.io/williamsteve216/alteronix-back:latest
 
       - name: Trigger deploy
         uses: peter-evans/repository-dispatch@v3
