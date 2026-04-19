@@ -84,6 +84,7 @@ public class OAuth2AuthenticationSuccessHandler
 
         // redirection frontend
         String dashboardUrl = clientUrl + "/dashboard";
+        log.info("L'url du dashboard est {}", dashboardUrl);
         getRedirectStrategy().sendRedirect(
                 request, response, dashboardUrl
         );
